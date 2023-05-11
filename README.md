@@ -91,3 +91,83 @@ logger = mdlog.WithMods(lgr, func(ctx context.Context, err error, md map[string]
 
 ### http
 see [example](example/main.go) for middleware
+
+### example
+```
+go run example/main.go 2>&1 | jq .
+{
+  "level": "debug",
+  "metadata": {
+    "app": "my-cool-app",
+    "body": "",
+    "env": "prod",
+    "headers": {
+      "Accept-Encoding": [
+        "gzip"
+      ],
+      "User-Agent": [
+        "Go-http-client/1.1"
+      ],
+      "X-Request-Id": [
+        "3acb9248-42f3-44cd-a8bd-1f660047c41f"
+      ]
+    },
+    "request-id": "3acb9248-42f3-44cd-a8bd-1f660047c41f",
+    "url": "/fake/endpoint"
+  },
+  "time": 1683848883,
+  "message": "incoming http request"
+}
+{
+  "level": "info",
+  "metadata": {
+    "app": "my-cool-app",
+    "env": "prod",
+    "foo": "bar",
+    "request-id": "3acb9248-42f3-44cd-a8bd-1f660047c41f"
+  },
+  "time": 1683848883,
+  "message": "handling request"
+}
+{
+  "level": "error",
+  "error": "surface error: secondary error: root error",
+  "metadata": {
+    "app": "my-cool-app",
+    "env": "prod",
+    "error-trace": [
+      {
+        "message": "surface error",
+        "metadata": {
+          "pee": "poo"
+        }
+      },
+      {
+        "message": "secondary error",
+        "metadata": {
+          "foo": "bar"
+        }
+      },
+      {
+        "message": "root error",
+        "metadata": null
+      }
+    ],
+    "poop": "plop",
+    "request-id": "3acb9248-42f3-44cd-a8bd-1f660047c41f"
+  },
+  "time": 1683848883
+}
+{
+  "level": "debug",
+  "metadata": {
+    "app": "my-cool-app",
+    "body": "surface error",
+    "env": "prod",
+    "request-id": "3acb9248-42f3-44cd-a8bd-1f660047c41f",
+    "status-code": 500
+  },
+  "time": 1683848883,
+  "message": "outgoing http response"
+}
+```
