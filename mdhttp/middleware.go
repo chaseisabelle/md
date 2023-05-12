@@ -26,7 +26,7 @@ func RequestIDMiddleware(hf http.HandlerFunc, key string) http.HandlerFunc {
 			r.Header.Set(key, rid)
 		}
 
-		hf(w, r.WithContext(mdctx.SetRequestID(r.Context(), rid)))
+		hf(w, r.WithContext(mdctx.WithRequestID(r.Context(), rid)))
 	}
 }
 

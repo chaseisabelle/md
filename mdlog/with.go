@@ -17,6 +17,10 @@ func WithPersistedMetadata(lgr Logger, pmd map[string]any) Logger {
 	}
 
 	mod := func(md map[string]any) map[string]any {
+		if md == nil {
+			return pmd
+		}
+
 		for key, val := range pmd {
 			md[key] = val
 		}
@@ -67,7 +71,7 @@ func WithRequestID(lgr Logger, key string) Logger {
 			return md
 		}
 
-		rid := mdctx.GetRequestID(ctx)
+		rid := mdctx.RequestID(ctx)
 
 		if rid == "" {
 			return md
