@@ -65,11 +65,11 @@ logger.Warn(context.TODO(), "this is a warning message", md.MD{
     "foo": "bar",
 })
 
-logger.Error(context.TODO(), md.E("this is an error message", nil), md.MD{
+logger.Error(context.TODO(), md.E("this is an error", nil), md.MD{
     "foo": "bar",
 })
 
-logger.Fatal(context.TODO(), "this is a fatal error message", md.MD{
+logger.Fatal(context.TODO(), md.E("this is a fatal error", nil), md.MD{
     "foo": "bar",
 })
 
@@ -78,10 +78,10 @@ logger = mdlog.WithErrorTrace(logger, "custom-error-trace-key")
 logger = mdlog.WithRequestID(logger, "") //<< leave key blank for default
 
 // custom modifier
-logger = mdlog.WithMods(lgr, func(ctx context.Context, err error, md map[string]any, f ErrFunc) {
-        f(ctx, md.W(err, "this error is wrapped", nil), md) //<< wrap error
-    }, func(ctx context.Context, msg string, md map[string]any, f MsgFunc) {
-        f(ctx, strings.ToUpper(msg), md) //<< change message to uppsercase
+logger = mdlog.WithMods(lgr, func(ctx context.Context, err error, md map[string]any, f mdlog.ErrFunc) {
+        f(ctx, md.W(err, "it's a wrap", nil), md) //<< wrap error
+    }, func(ctx context.Context, msg string, md map[string]any, f mdlog.MsgFunc) {
+        f(ctx, strings.ToUpper(msg), md) //<< change message to uppercase
     })
 }
 

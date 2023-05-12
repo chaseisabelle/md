@@ -18,22 +18,27 @@ type ErrMod func(context.Context, error, map[string]any, ErrFunc)
 // MsgMod is a func to modify a message entry
 type MsgMod func(context.Context, string, map[string]any, MsgFunc)
 
+// Fatal log a fatal error
 func (m *Mod) Fatal(ctx context.Context, err error, md map[string]any) {
 	m.fatal(ctx, err, md, m.logger.Fatal)
 }
 
+// Error log an error
 func (m *Mod) Error(ctx context.Context, err error, md map[string]any) {
 	m.error(ctx, err, md, m.logger.Error)
 }
 
+// Warn log a warning
 func (m *Mod) Warn(ctx context.Context, msg string, md map[string]any) {
 	m.warn(ctx, msg, md, m.logger.Warn)
 }
 
+// Info log info
 func (m *Mod) Info(ctx context.Context, msg string, md map[string]any) {
 	m.info(ctx, msg, md, m.logger.Info)
 }
 
+// Debug log debug message
 func (m *Mod) Debug(ctx context.Context, msg string, md map[string]any) {
 	m.debug(ctx, msg, md, m.logger.Debug)
 }
