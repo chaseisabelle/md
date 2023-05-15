@@ -8,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"io"
 	"net/http"
+	"net/http/httptest"
 )
 
 // RequestIDMiddleware gets a request id from the headers and adds it to the context
@@ -61,16 +62,30 @@ func RequestLoggerMiddleware(hf http.HandlerFunc, lgr mdlog.Logger) http.Handler
 // probably don't use this in a prod env
 func ResponseLoggerMiddleware(hf http.HandlerFunc, lgr mdlog.Logger) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		c := &ResponseWriterCatcher{
-			ResponseWriter: w,
-			StatusCode:     http.StatusOK,
+		rec := httptest.NewRecorder()
+
+		hf(rec, r)
+
+		res := rec.Result()
+
+		md := map[string]any{
+			"status-code": res.StatusCode,
 		}
 
-		hf(c, r)
+		if res.Body != nil {
+			bod, err := io.ReadAll(res.Body)
 
-		lgr.Debug(r.Context(), "outgoing http response", map[string]any{
-			"status-code": c.StatusCode,
-			"body":        string(c.Body),
-		})
+			if err != nil {
+				lgr.Error(r.Context(), mderr.Wrap(err, "failed to read response body", nil), md)
+			}
+
+			if bod != nil {
+				md["body"] = string(bod)
+			}
+
+			res.Body = io.NopCloser(bytes.NewBuffer(bod))
+		}
+
+		lgr.Debug(r.Context(), "outgoing http response", md)
 	}
 }
