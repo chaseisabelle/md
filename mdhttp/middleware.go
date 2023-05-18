@@ -72,6 +72,8 @@ func ResponseLoggerMiddleware(hf http.HandlerFunc, lgr mdlog.Logger) http.Handle
 			"status-code": res.StatusCode,
 		}
 
+		w.WriteHeader(res.StatusCode)
+
 		if res.Body != nil {
 			bod, err := io.ReadAll(res.Body)
 
@@ -83,7 +85,13 @@ func ResponseLoggerMiddleware(hf http.HandlerFunc, lgr mdlog.Logger) http.Handle
 				md["body"] = string(bod)
 			}
 
-			res.Body = io.NopCloser(bytes.NewBuffer(bod))
+			bw, err := w.Write(bod)
+
+			if err != nil {
+				lgr.Error(r.Context(), mderr.Wrap(err, "failed to write back response body", map[string]any{
+					"wrote": bw,
+				}), nil)
+			}
 		}
 
 		lgr.Debug(r.Context(), "outgoing http response", md)
